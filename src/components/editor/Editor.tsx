@@ -54,8 +54,18 @@ export function Editor({
   const [showUrl, setShowUrl] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const skipAutosave = useRef(true);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Serialized name/background/elements from the last successful save (or load). */
+  const lastSavedRef = useRef<string | null>(null);
+  const persistInFlight = useRef(false);
+
+  function snapshotOf(t: Template) {
+    return JSON.stringify({
+      name: t.name,
+      background: t.background,
+      elements: t.elements,
+    });
+  }
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/templates/${templateId}`);
@@ -64,13 +74,13 @@ export function Editor({
       return;
     }
     const json = (await res.json()) as EditorPayload;
+    lastSavedRef.current = snapshotOf(json.template);
     setTemplate(json.template);
     setMeta({
       canEdit: json.canEdit,
       isOwner: json.isOwner,
       isAnonymous: json.isAnonymous,
     });
-    skipAutosave.current = true;
   }, [templateId]);
 
   useEffect(() => {
@@ -139,55 +149,64 @@ export function Editor({
 
   const persist = useCallback(
     async (draft: Template) => {
-      if (!meta?.canEdit) return;
+      if (!meta?.canEdit || persistInFlight.current) return;
+      const snap = snapshotOf(draft);
+      if (snap === lastSavedRef.current) return;
+
+      persistInFlight.current = true;
       setSaveState("saving");
       setError(null);
-      const res = await fetch(`/api/templates/${templateId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: draft.name,
-          background: draft.background,
-          elements: draft.elements,
-        }),
-      });
-      if (res.status === 403) {
-        setSaveState("error");
-        setError(
-          "This template belongs to someone else. Duplicate it if you want to edit.",
+      try {
+        const res = await fetch(`/api/templates/${templateId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: draft.name,
+            background: draft.background,
+            elements: draft.elements,
+          }),
+        });
+        if (res.status === 403) {
+          setSaveState("error");
+          setError(
+            "This template belongs to someone else. Duplicate it if you want to edit.",
+          );
+          await load();
+          return;
+        }
+        if (!res.ok) {
+          setSaveState("error");
+          setError("Failed to save");
+          return;
+        }
+        const updated = (await res.json()) as Template;
+        // Mark the draft we sent as saved (not the server echo), so key-order /
+        // normalization differences don't look like new edits.
+        lastSavedRef.current = snap;
+        // Keep local draft; only refresh ownership flags from the server.
+        setMeta((m) =>
+          m
+            ? {
+                ...m,
+                isAnonymous: updated.userId == null,
+                isOwner: updated.userId != null,
+              }
+            : m,
         );
-        await load();
-        return;
+        setSaveState("saved");
+        setTimeout(() => setSaveState((s) => (s === "saved" ? "idle" : s)), 1500);
+      } finally {
+        persistInFlight.current = false;
       }
-      if (!res.ok) {
-        setSaveState("error");
-        setError("Failed to save");
-        return;
-      }
-      const updated = (await res.json()) as Template;
-      setTemplate(updated);
-      setMeta((m) =>
-        m
-          ? {
-              ...m,
-              isAnonymous: updated.userId == null,
-              isOwner: updated.userId != null,
-            }
-          : m,
-      );
-      setSaveState("saved");
-      setTimeout(() => setSaveState((s) => (s === "saved" ? "idle" : s)), 1500);
     },
     [meta?.canEdit, templateId, load],
   );
 
-  // Debounced autosave
+  // Debounced autosave — only when the draft differs from last save
   useEffect(() => {
     if (!template || !meta?.canEdit) return;
-    if (skipAutosave.current) {
-      skipAutosave.current = false;
-      return;
-    }
+    if (snapshotOf(template) === lastSavedRef.current) return;
+
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
       void persist(template);
