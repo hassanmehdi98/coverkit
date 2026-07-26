@@ -51,7 +51,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Fonts for Satori
+# Fonts for Satori + brand mark for demo seed
 COPY --from=builder /app/assets ./assets
 
 # Prisma schema/migrations + full CLI tree for migrate on boot

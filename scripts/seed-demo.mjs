@@ -3,12 +3,12 @@
  *   docker compose -f docker-compose.prod.yml --env-file .env.production exec app \
  *     node scripts/seed-demo.mjs
  */
+import { readFileSync } from "fs";
 import { createRequire } from "module";
+import path from "path";
+
 import { PrismaClient } from "@prisma/client";
-import {
-  PutObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 const require = createRequire(import.meta.url);
 const { Resvg } = require("@resvg/resvg-js");
@@ -46,16 +46,18 @@ async function put(key, body, contentType) {
   return publicUrl(key);
 }
 
+function createDemoLogoPng() {
+  // Path-based SVG — no system fonts required (Docker slim has none).
+  const svgPath = path.join(process.cwd(), "assets", "brand", "ck-mark.svg");
+  const svg = readFileSync(svgPath, "utf8");
+  const resvg = new Resvg(svg, { fitTo: { mode: "width", value: 160 } });
+  return Buffer.from(resvg.render().asPng());
+}
+
 async function main() {
-  const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
-  <rect width="160" height="160" rx="36" fill="#ffffff"/>
-  <rect x="18" y="18" width="124" height="124" rx="28" fill="#0f766e"/>
-  <text x="80" y="98" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
-        font-size="52" font-weight="700" fill="#ffffff">CK</text>
-</svg>`;
-  const png = Buffer.from(new Resvg(svg, { fitTo: { mode: "width", value: 160 } }).render().asPng());
-  const logoUrl = await put("demo/logo.png", png, "image/png");
+  const logoPng = createDemoLogoPng();
+  const logoUrl = await put("demo/logo.png", logoPng, "image/png");
+  console.log("Uploaded demo logo:", logoUrl);
 
   const background = {
     type: "gradient",

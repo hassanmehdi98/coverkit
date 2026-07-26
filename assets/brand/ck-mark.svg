@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <!-- Path-based CK mark (no fonts) so Resvg/Docker render correctly -->
+  <rect width="160" height="160" rx="36" fill="#ffffff"/>
+  <rect x="18" y="18" width="124" height="124" rx="28" fill="#0f766e"/>
+  <!-- C -->
+  <path
+    fill="#ffffff"
+    d="M70 44c-20.7 0-37.5 15.4-37.5 36S49.3 116 70 116c10.2 0 19.4-3.7 26.2-9.8l-11.4-11.4c-3.8 3.2-8.9 5.2-14.8 5.2-11.4 0-20.5-8.5-20.5-20s9.1-20 20.5-20c5.9 0 11 2 14.8 5.2l11.4-11.4C89.4 47.7 80.2 44 70 44z"
+  />
+  <!-- K -->
+  <path
+    fill="#ffffff"
+    d="M96 50h16v24.6L132.8 50H152l-28.4 32.2L154 110h-19.8l-22.2-26.8V110H96V50z"
+  />
+</svg>

@@ -1,29 +1,14 @@
 import "dotenv/config";
 
 import { PrismaClient } from "@prisma/client";
-import { Resvg } from "@resvg/resvg-js";
 
+import { renderCkLogoPng } from "../src/lib/ck-logo";
 import { putObject } from "../src/lib/storage";
 
 const prisma = new PrismaClient();
 
-async function createDemoLogoPng(): Promise<Buffer> {
-  const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
-  <rect width="160" height="160" rx="36" fill="#ffffff"/>
-  <rect x="18" y="18" width="124" height="124" rx="28" fill="#0f766e"/>
-  <text x="80" y="98" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
-        font-size="52" font-weight="700" fill="#ffffff">CK</text>
-</svg>`;
-
-  const resvg = new Resvg(svg, {
-    fitTo: { mode: "width", value: 160 },
-  });
-  return Buffer.from(resvg.render().asPng());
-}
-
 async function main() {
-  const logoPng = await createDemoLogoPng();
+  const logoPng = renderCkLogoPng(160);
   const logoUrl = await putObject({
     key: "demo/logo.png",
     body: logoPng,

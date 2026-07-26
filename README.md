@@ -50,7 +50,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.production up -d --bui
 - Waitlist: `POST /api/waitlist`
 - Funnel events: `POST /api/events` (self-hosted `AnalyticsEvent` table)
 
-Optional footer env vars: `NEXT_PUBLIC_BUILT_BY`, `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_TWITTER_URL`.
+Optional footer env vars: `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_TWITTER_URL`.
 
 ### Editor (Phase 3)
 

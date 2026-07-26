@@ -8,7 +8,6 @@ import { WaitlistForm } from "@/components/landing/WaitlistForm";
 import { PresetPicker } from "@/components/preset-picker";
 import { track } from "@/lib/analytics";
 
-const BUILT_BY = process.env.NEXT_PUBLIC_BUILT_BY ?? "Hassan";
 const CONTACT =
   process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "hello@coverkit.dev";
 const TWITTER =
@@ -203,24 +202,21 @@ export function LandingPage() {
       </section>
 
       <footer className="border-t border-zinc-200 bg-white px-5 py-10 md:px-8">
-        <div className="mx-auto flex max-w-5xl flex-col gap-3 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
-          <p>Built by {BUILT_BY}</p>
-          <div className="flex flex-wrap gap-4">
-            <a className="hover:text-zinc-900" href={`mailto:${CONTACT}`}>
-              {CONTACT}
-            </a>
-            <a
-              className="hover:text-zinc-900"
-              href={TWITTER}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Twitter / X
-            </a>
-            <Link className="hover:text-zinc-900" href="/dashboard">
-              Dashboard
-            </Link>
-          </div>
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-4 text-sm text-zinc-600">
+          <a className="hover:text-zinc-900" href={`mailto:${CONTACT}`}>
+            {CONTACT}
+          </a>
+          <a
+            className="hover:text-zinc-900"
+            href={TWITTER}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Twitter / X
+          </a>
+          <Link className="hover:text-zinc-900" href="/dashboard">
+            Dashboard
+          </Link>
         </div>
       </footer>
     </div>

@@ -244,7 +244,9 @@ docker compose -f docker-compose.prod.yml --env-file .env.production exec app \
   node scripts/seed-demo.mjs
 ```
 
-Verify: `https://YOUR_DOMAIN/img/demo.png?title=Prod+Check`
+Re-run the same command after pulling logo/favicon fixes so `demo/logo.png` is regenerated with the CK mark.
+
+Verify: `https://coverkit.dev/img/demo.png?title=Prod+Check`
 
 ---
 
