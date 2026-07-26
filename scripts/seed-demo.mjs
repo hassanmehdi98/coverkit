@@ -3,7 +3,6 @@
  *   docker compose -f docker-compose.prod.yml --env-file .env.production exec app \
  *     node scripts/seed-demo.mjs
  */
-import { readFileSync } from "fs";
 import { createRequire } from "module";
 import path from "path";
 
@@ -47,10 +46,24 @@ async function put(key, body, contentType) {
 }
 
 function createDemoLogoPng() {
-  // Path-based SVG — no system fonts required (Docker slim has none).
-  const svgPath = path.join(process.cwd(), "assets", "brand", "ck-mark.svg");
-  const svg = readFileSync(svgPath, "utf8");
-  const resvg = new Resvg(svg, { fitTo: { mode: "width", value: 160 } });
+  // Bundle Inter Bold — Docker slim has no system fonts.
+  const fontPath = path.join(process.cwd(), "assets", "fonts", "Inter-Bold.ttf");
+  const size = 160;
+  const inset = 18;
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+  <rect width="${size}" height="${size}" rx="36" fill="#ffffff"/>
+  <rect x="${inset}" y="${inset}" width="124" height="124" rx="28" fill="#0f766e"/>
+  <text x="81.51" y="102.71" text-anchor="middle" font-family="Inter" font-size="64" font-weight="700" fill="#ffffff">CK</text>
+</svg>`;
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: size },
+    font: {
+      fontFiles: [fontPath],
+      defaultFontFamily: "Inter",
+      loadSystemFonts: false,
+    },
+  });
   return Buffer.from(resvg.render().asPng());
 }
 
