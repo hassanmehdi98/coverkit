@@ -227,6 +227,14 @@ docker compose -f docker-compose.prod.yml --env-file .env.production up -d --bui
 docker compose -f docker-compose.prod.yml --env-file .env.production logs -f app
 ```
 
+If you already deployed and only pulled a fix (e.g. Prisma CLI path), rebuild the app image:
+
+```bash
+cd /opt/coverkit
+git pull
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build --force-recreate app
+```
+
 Build is **arm64-native** on `t4g` — no QEMU needed.
 
 ### 6.7 Seed the demo template
