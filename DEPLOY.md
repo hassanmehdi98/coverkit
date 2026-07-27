@@ -216,8 +216,12 @@ Fill in at least:
 | `AUTH_GOOGLE_*` | from Google console |
 | `S3_BUCKET` / `S3_REGION` | your bucket |
 | `S3_PUBLIC_BASE_URL` | `https://BUCKET.s3.REGION.amazonaws.com` |
+| `SENTRY_DSN` | Sentry project DSN (server / render errors) |
+| `NEXT_PUBLIC_SENTRY_DSN` | same DSN (client `global-error`; inlined at Docker build) |
 
 **Do not set** `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, or `S3_SECRET_ACCESS_KEY` in production.
+
+Sentry is optional: leave both DSN vars empty and the SDK is a no-op. For readable stack traces, optionally set `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT` in `.env.production` (chmod 600) — source-map upload is skipped when the token is absent, so builds never fail for missing Sentry credentials.
 
 ### 6.6 First deploy (migrations run in the container entrypoint)
 

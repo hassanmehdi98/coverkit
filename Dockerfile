@@ -20,6 +20,16 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 # Prisma generate does not need a live DB; provide a dummy URL for schema load.
 ENV DATABASE_URL="postgresql://coverkit:coverkit@localhost:5432/coverkit?schema=public"
+# Client DSN is inlined at build; server DSN comes from runtime env_file.
+ARG NEXT_PUBLIC_SENTRY_DSN=
+ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
+# Optional source-map upload (no-op when unset — see next.config.ts)
+ARG SENTRY_AUTH_TOKEN=
+ARG SENTRY_ORG=
+ARG SENTRY_PROJECT=
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+ENV SENTRY_ORG=$SENTRY_ORG
+ENV SENTRY_PROJECT=$SENTRY_PROJECT
 RUN npx prisma generate
 RUN npm run build
 

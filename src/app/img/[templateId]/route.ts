@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
@@ -35,50 +36,52 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<{ templateId: string }> },
 ) {
-  const ip = clientIpFromRequest(request);
-  const { allowed } = checkRateLimit(ip, RATE_LIMIT);
-  if (!allowed) {
-    return NextResponse.json(
-      { error: "Rate limit exceeded. Max 60 renders per minute." },
-      { status: 429 },
-    );
-  }
-
-  const { templateId: rawId } = await context.params;
-  const templateId = rawId.replace(/\.png$/i, "");
-
-  const searchParams = request.nextUrl.searchParams;
+  let templateId = "unknown";
   const variables: Record<string, string> = {};
-  searchParams.forEach((value, key) => {
-    variables[key] = value;
-  });
 
   try {
-    assertQueryParamsWithinLimit(variables);
-  } catch (err) {
-    if (err instanceof QueryParamTooLongError) {
-      return NextResponse.json({ error: err.message }, { status: 400 });
+    const ip = clientIpFromRequest(request);
+    const { allowed } = checkRateLimit(ip, RATE_LIMIT);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Max 60 renders per minute." },
+        { status: 429 },
+      );
     }
-    throw err;
-  }
 
-  // Sanitize for substitution (also applied again inside substituteVariables)
-  for (const key of Object.keys(variables)) {
-    variables[key] = sanitizeVariableValue(variables[key]);
-  }
+    const { templateId: rawId } = await context.params;
+    templateId = rawId.replace(/\.png$/i, "");
 
-  const row = await prisma.template.findUnique({ where: { id: templateId } });
-  if (!row) {
-    return NextResponse.json({ error: "Template not found" }, { status: 404 });
-  }
+    const searchParams = request.nextUrl.searchParams;
+    searchParams.forEach((value, key) => {
+      variables[key] = value;
+    });
 
-  const cacheHash = renderCacheKey(row.id, row.updatedAt, variables);
-  const cached = await getCachedPng(cacheHash);
-  if (cached) {
-    return pngResponse(cached, true);
-  }
+    try {
+      assertQueryParamsWithinLimit(variables);
+    } catch (err) {
+      if (err instanceof QueryParamTooLongError) {
+        return NextResponse.json({ error: err.message }, { status: 400 });
+      }
+      throw err;
+    }
 
-  try {
+    // Sanitize for substitution (also applied again inside substituteVariables)
+    for (const key of Object.keys(variables)) {
+      variables[key] = sanitizeVariableValue(variables[key]);
+    }
+
+    const row = await prisma.template.findUnique({ where: { id: templateId } });
+    if (!row) {
+      return NextResponse.json({ error: "Template not found" }, { status: 404 });
+    }
+
+    const cacheHash = renderCacheKey(row.id, row.updatedAt, variables);
+    const cached = await getCachedPng(cacheHash);
+    if (cached) {
+      return pngResponse(cached, true);
+    }
+
     const template = templateFromDb(row);
     const png = await renderTemplateToPng(template, variables);
 
@@ -92,6 +95,10 @@ export async function GET(
     return pngResponse(png, false);
   } catch (err) {
     console.error("Render failed:", err);
+    Sentry.captureException(err, {
+      tags: { templateId },
+      extra: { queryParams: variables },
+    });
     return NextResponse.json(
       { error: "Failed to render template" },
       { status: 500 },
