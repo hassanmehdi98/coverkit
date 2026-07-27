@@ -237,16 +237,18 @@ docker compose -f docker-compose.prod.yml --env-file .env.production up -d --bui
 
 Build is **arm64-native** on `t4g` — no QEMU needed.
 
-### 6.7 Seed the demo template
+### 6.7 Seed the demo + site OG templates
 
 ```bash
 docker compose -f docker-compose.prod.yml --env-file .env.production exec app \
   node scripts/seed-demo.mjs
 ```
 
-Re-run the same command after pulling logo/favicon fixes so `demo/logo.png` is regenerated with the CK mark.
+Re-run the same command after pulling logo/favicon or site-card fixes so `demo/logo.png` and the `site` template stay in sync.
 
-Verify: `https://coverkit.dev/img/demo.png?title=Prod+Check`
+Verify:
+- `https://coverkit.dev/img/demo.png?title=Prod+Check`
+- `https://coverkit.dev/img/site.png` (homepage Open Graph image; no watermark)
 
 ---
 

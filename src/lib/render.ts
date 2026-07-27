@@ -51,13 +51,16 @@ export async function renderTemplateToPng(
     template.elements.map((el) => elementToNode(el, variables)),
   );
 
+  // Site marketing card dogfoods the renderer — never stamp "made with CoverKit" on it.
+  const showWatermark = template.id !== "site";
+
   const tree: SatoriNode = {
     type: "div",
     props: {
       style: backgroundStyle(background),
       children: [
         ...elementNodes.filter(Boolean),
-        watermarkNode(),
+        ...(showWatermark ? [watermarkNode()] : []),
       ] as SatoriNode[],
     },
   };

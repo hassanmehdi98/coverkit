@@ -3,6 +3,7 @@ import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 
 import { renderCkLogoPng } from "../src/lib/ck-logo";
+import { createSiteOgTemplate } from "../src/lib/site-og-template";
 import { putObject } from "../src/lib/storage";
 
 const prisma = new PrismaClient();
@@ -16,7 +17,7 @@ async function main() {
   });
   console.log("Uploaded demo logo:", logoUrl);
 
-  const background = {
+  const demoBackground = {
     type: "gradient" as const,
     gradient: {
       from: "#0f172a",
@@ -25,7 +26,7 @@ async function main() {
     },
   };
 
-  const elements = [
+  const demoElements = [
     {
       id: "logo",
       type: "image" as const,
@@ -73,19 +74,40 @@ async function main() {
       id: "demo",
       userId: null,
       name: "Demo Card",
-      background,
-      elements,
+      background: demoBackground,
+      elements: demoElements,
     },
     update: {
       name: "Demo Card",
-      background,
-      elements,
+      background: demoBackground,
+      elements: demoElements,
       userId: null,
     },
   });
 
   console.log("Seeded template id=demo");
   console.log("Try: /img/demo.png?title=Hello+World");
+
+  const site = createSiteOgTemplate(logoUrl);
+  await prisma.template.upsert({
+    where: { id: "site" },
+    create: {
+      id: "site",
+      userId: null,
+      name: site.name,
+      background: site.background,
+      elements: site.elements,
+    },
+    update: {
+      name: site.name,
+      background: site.background,
+      elements: site.elements,
+      userId: null,
+    },
+  });
+
+  console.log("Seeded template id=site (homepage OG, no watermark)");
+  console.log("Try: /img/site.png");
 }
 
 main()
