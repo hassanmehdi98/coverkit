@@ -6,6 +6,7 @@ export function LiveDemo() {
   const [title, setTitle] = useState("Launch week is live");
   const [debounced, setDebounced] = useState(title);
   const [fade, setFade] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(title), 280);
@@ -18,7 +19,16 @@ export function LiveDemo() {
     return () => cancelAnimationFrame(t);
   }, [debounced]);
 
+  const encodedTitle = encodeURIComponent(title);
+  const path = `/img/demo.png?title=${encodedTitle}`;
+  const displayUrl = `coverkit.dev${path}`;
   const src = `/img/demo.png?title=${encodeURIComponent(debounced || " ")}&t=${encodeURIComponent(debounced)}`;
+
+  async function copyUrl() {
+    await navigator.clipboard.writeText(`https://${displayUrl}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   return (
     <div className="w-full">
@@ -43,6 +53,24 @@ export function LiveDemo() {
           height={630}
           className={`h-auto w-full transition-opacity duration-500 ${fade ? "opacity-100" : "opacity-0"}`}
         />
+      </div>
+
+      <div className="mt-3 flex items-center gap-2">
+        <a
+          href={path}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="min-w-0 flex-1 truncate font-mono text-xs text-[color:var(--landing-muted)] underline decoration-white/25 underline-offset-2 transition hover:text-white hover:decoration-white/50"
+        >
+          {displayUrl}
+        </a>
+        <button
+          type="button"
+          onClick={() => void copyUrl()}
+          className="shrink-0 rounded border border-white/15 px-2 py-1 font-[family-name:var(--font-landing-sans)] text-xs text-[color:var(--landing-muted)] transition hover:border-white/30 hover:text-white"
+        >
+          {copied ? "Copied" : "Copy"}
+        </button>
       </div>
     </div>
   );
