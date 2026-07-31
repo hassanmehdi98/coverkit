@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { resolveExistingUserId } from "@/lib/session-user";
 import { templateFromDb } from "@/lib/template";
 
 export const runtime = "nodejs";
@@ -22,10 +23,12 @@ export async function POST(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+  const userId = await resolveExistingUserId(session?.user?.id);
+
   const copy = await prisma.template.create({
     data: {
       id: nanoid(12),
-      userId: session?.user?.id ?? null,
+      userId,
       name: `${row.name} (copy)`,
       background: row.background ?? {},
       elements: row.elements ?? [],

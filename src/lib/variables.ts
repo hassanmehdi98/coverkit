@@ -56,6 +56,18 @@ export function buildImageQueryString(
   return qs ? `?${qs}` : "";
 }
 
+/** Absolute PNG URL using APP_URL (or similar) as the origin. */
+export function buildImageUrl(
+  baseUrl: string,
+  templateId: string,
+  sampleValues: Record<string, string>,
+  variableNames: string[],
+): string {
+  const origin = baseUrl.replace(/\/$/, "");
+  const qs = buildImageQueryString(sampleValues, variableNames);
+  return `${origin}/img/${templateId}.png${qs}`;
+}
+
 export function assertQueryParamsWithinLimit(
   params: Record<string, string>,
 ): void {

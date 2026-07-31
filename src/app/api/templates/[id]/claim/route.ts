@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { resolveExistingUserId } from "@/lib/session-user";
 import { templateFromDb } from "@/lib/template";
 
 export const runtime = "nodejs";
@@ -11,7 +12,8 @@ type RouteContext = { params: Promise<{ id: string }> };
 /** Claim an anonymous template for the signed-in user. */
 export async function POST(_request: Request, context: RouteContext) {
   const session = await auth();
-  if (!session?.user?.id) {
+  const userId = await resolveExistingUserId(session?.user?.id);
+  if (!userId) {
     return NextResponse.json({ error: "Sign in required" }, { status: 401 });
   }
 
@@ -22,7 +24,7 @@ export async function POST(_request: Request, context: RouteContext) {
   }
 
   if (row.userId != null) {
-    if (row.userId === session.user.id) {
+    if (row.userId === userId) {
       return NextResponse.json(templateFromDb(row));
     }
     return NextResponse.json(
@@ -33,7 +35,7 @@ export async function POST(_request: Request, context: RouteContext) {
 
   const updated = await prisma.template.update({
     where: { id },
-    data: { userId: session.user.id },
+    data: { userId },
   });
 
   return NextResponse.json(templateFromDb(updated));

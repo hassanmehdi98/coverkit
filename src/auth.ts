@@ -21,6 +21,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user?.id) {
         token.sub = user.id;
       }
+      // JWT can outlive the DB row (e.g. local DB reset). Drop identity so
+      // template creates don't hit Template_userId_fkey with a missing user.
+      if (token.sub) {
+        const exists = await prisma.user.findUnique({
+          where: { id: token.sub },
+          select: { id: true },
+        });
+        if (!exists) {
+          return {};
+        }
+      }
       return token;
     },
     async session({ session, token }) {

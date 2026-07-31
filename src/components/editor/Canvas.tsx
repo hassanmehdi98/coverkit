@@ -35,6 +35,68 @@ type DragMode =
       origY: number;
     };
 
+function InlineTextEditor({
+  content,
+  onChange,
+  onCommit,
+  onCancel,
+}: {
+  content: string;
+  onChange: (next: string) => void;
+  onCommit: () => void;
+  onCancel: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const finished = useRef(false);
+
+  useLayoutEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    node.textContent = content;
+    node.focus();
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+    // Mount only — don't reset while the user is typing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function finish(kind: "commit" | "cancel") {
+    if (finished.current) return;
+    finished.current = true;
+    if (kind === "commit") onCommit();
+    else onCancel();
+  }
+
+  return (
+    <div
+      ref={ref}
+      contentEditable
+      suppressContentEditableWarning
+      role="textbox"
+      aria-label="Edit text"
+      onPointerDown={(e) => e.stopPropagation()}
+      onInput={() => onChange(ref.current?.innerText ?? "")}
+      onBlur={() => finish("commit")}
+      onKeyDown={(e) => {
+        e.stopPropagation();
+        if (e.key === "Escape") {
+          e.preventDefault();
+          finish("cancel");
+        }
+      }}
+      style={{
+        outline: "none",
+        width: "100%",
+        minHeight: "100%",
+        cursor: "text",
+      }}
+    />
+  );
+}
+
 export function Canvas({
   template,
   sampleValues,
@@ -57,6 +119,8 @@ export function Canvas({
   const dragRef = useRef<DragMode | null>(null);
   const elementsRef = useRef(template.elements);
   elementsRef.current = template.elements;
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editingSnapshotRef = useRef<string | null>(null);
 
   const measure = useCallback(() => {
     const el = viewportRef.current;
@@ -75,11 +139,21 @@ export function Canvas({
   }, [measure]);
 
   useEffect(() => {
+    if (editingId && !template.elements.some((el) => el.id === editingId)) {
+      setEditingId(null);
+    }
+  }, [editingId, template.elements]);
+
+  useEffect(() => {
     if (!canEdit) return;
 
     function onKeyDown(e: KeyboardEvent) {
-      const tag = (e.target as HTMLElement)?.tagName;
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const tag = target.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (target.isContentEditable) return;
+      if (editingId) return;
       if (!selectedId) return;
 
       const el = template.elements.find((x) => x.id === selectedId);
@@ -112,7 +186,14 @@ export function Canvas({
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [canEdit, selectedId, template.elements, onChangeElements, onSelect]);
+  }, [
+    canEdit,
+    selectedId,
+    editingId,
+    template.elements,
+    onChangeElements,
+    onSelect,
+  ]);
 
   function onPointerMove(e: PointerEvent) {
     const drag = dragRef.current;
@@ -147,6 +228,10 @@ export function Canvas({
   }
 
   function startMove(e: ReactPointerEvent, el: Element) {
+    if (editingId === el.id) {
+      e.stopPropagation();
+      return;
+    }
     if (!canEdit) return;
     e.stopPropagation();
     onSelect(el.id);
@@ -180,6 +265,14 @@ export function Canvas({
     window.addEventListener("pointerup", onPointerUp);
   }
 
+  function beginTextEdit(el: Element) {
+    if (!canEdit || el.type !== "text") return;
+    dragRef.current = null;
+    editingSnapshotRef.current = el.content;
+    onSelect(el.id);
+    setEditingId(el.id);
+  }
+
   const bg = backgroundStyle(template.background) as CSSProperties;
 
   return (
@@ -207,10 +300,40 @@ export function Canvas({
           {template.elements.map((el) => {
             const style = renderElementStyle(el) as CSSProperties;
             const selected = selectedId === el.id;
+            const editing = editingId === el.id;
 
             let body: ReactNode = null;
             if (el.type === "text") {
-              body = substituteVariables(el.content, sampleValues);
+              body = editing ? (
+                <InlineTextEditor
+                  content={editingSnapshotRef.current ?? el.content}
+                  onChange={(next) => {
+                    onChangeElements(
+                      updateElement(elementsRef.current, el.id, {
+                        content: next,
+                      }),
+                    );
+                  }}
+                  onCommit={() => {
+                    editingSnapshotRef.current = null;
+                    setEditingId(null);
+                  }}
+                  onCancel={() => {
+                    const snapshot = editingSnapshotRef.current;
+                    if (snapshot != null) {
+                      onChangeElements(
+                        updateElement(elementsRef.current, el.id, {
+                          content: snapshot,
+                        }),
+                      );
+                    }
+                    editingSnapshotRef.current = null;
+                    setEditingId(null);
+                  }}
+                />
+              ) : (
+                substituteVariables(el.content, sampleValues)
+              );
             } else if (el.type === "image") {
               const src = substituteVariables(el.src, sampleValues);
               body = src ? (
@@ -235,9 +358,13 @@ export function Canvas({
                 style={style}
                 className={selected ? "outline outline-2 outline-sky-500" : undefined}
                 onPointerDown={(e) => startMove(e, el)}
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  beginTextEdit(el);
+                }}
               >
                 {body}
-                {selected && canEdit ? (
+                {selected && canEdit && !editing ? (
                   <div
                     onPointerDown={(e) => startResize(e, el)}
                     className="absolute right-0 bottom-0 h-3.5 w-3.5 translate-x-1/2 translate-y-1/2 cursor-se-resize rounded-sm border-2 border-sky-500 bg-white"

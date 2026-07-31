@@ -9,6 +9,13 @@ export default async function EditTemplatePage({
 }) {
   const { templateId } = await params;
   const { claim } = await searchParams;
+  const appUrl = process.env.APP_URL ?? "https://coverkit.dev";
 
-  return <Editor templateId={templateId} initialClaim={claim === "1"} />;
+  return (
+    <Editor
+      templateId={templateId}
+      initialClaim={claim === "1"}
+      appUrl={appUrl}
+    />
+  );
 }

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { createTemplateContent, type PresetId } from "@/lib/presets";
+import { resolveExistingUserId } from "@/lib/session-user";
 import { templateFromDb } from "@/lib/template";
 
 export const runtime = "nodejs";
@@ -31,10 +32,12 @@ export async function POST(request: NextRequest) {
   const content = createTemplateContent(preset);
   const id = nanoid(12);
 
+  const userId = await resolveExistingUserId(session?.user?.id);
+
   const row = await prisma.template.create({
     data: {
       id,
-      userId: session?.user?.id ?? null,
+      userId,
       name: content.name,
       background: content.background as object,
       elements: content.elements as object,

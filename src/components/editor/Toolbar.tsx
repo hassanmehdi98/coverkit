@@ -13,7 +13,6 @@ export function Toolbar({
   saveState,
   onPreview,
   onClaim,
-  onGetUrl,
   onDuplicate,
   busy,
 }: {
@@ -25,7 +24,6 @@ export function Toolbar({
   saveState: SaveState;
   onPreview: () => void;
   onClaim: () => void;
-  onGetUrl: () => void;
   onDuplicate: () => void;
   busy: boolean;
 }) {
@@ -90,13 +88,6 @@ export function Toolbar({
           className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-800 hover:bg-zinc-50"
         >
           Preview PNG
-        </button>
-        <button
-          type="button"
-          onClick={onGetUrl}
-          className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800"
-        >
-          Get URL
         </button>
       </div>
     </div>

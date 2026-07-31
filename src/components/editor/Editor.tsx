@@ -6,9 +6,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Canvas } from "@/components/editor/Canvas";
 import { ElementList } from "@/components/editor/ElementList";
-import { GetUrlModal } from "@/components/editor/GetUrlModal";
 import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
 import { Toolbar } from "@/components/editor/Toolbar";
+import { UrlBar } from "@/components/editor/UrlBar";
 import { VariablesPanel } from "@/components/editor/VariablesPanel";
 import {
   createImageElement,
@@ -35,9 +35,11 @@ type SaveState = "idle" | "saving" | "saved" | "error";
 export function Editor({
   templateId,
   initialClaim,
+  appUrl,
 }: {
   templateId: string;
   initialClaim: boolean;
+  appUrl: string;
 }) {
   const router = useRouter();
   const { status } = useSession();
@@ -51,7 +53,6 @@ export function Editor({
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [showUrl, setShowUrl] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -321,7 +322,6 @@ export function Editor({
         saveState={saveState}
         onPreview={previewPng}
         onClaim={() => void claim()}
-        onGetUrl={() => setShowUrl(true)}
         onDuplicate={() => void duplicate()}
         busy={busy}
       />
@@ -381,20 +381,26 @@ export function Editor({
           canEdit={meta.canEdit}
           templateId={templateId}
           onChangeElement={(patch) => {
-            if (!selected) return;
-            setElements(updateElement(template.elements, selected.id, patch));
+            if (!selectedId) return;
+            setTemplate((t) =>
+              t
+                ? {
+                    ...t,
+                    elements: updateElement(t.elements, selectedId, patch),
+                  }
+                : t,
+            );
           }}
           onChangeBackground={setBackground}
         />
       </div>
 
-      {showUrl ? (
-        <GetUrlModal
-          template={template}
-          sampleValues={sampleValues}
-          onClose={() => setShowUrl(false)}
-        />
-      ) : null}
+      <UrlBar
+        appUrl={appUrl}
+        templateId={templateId}
+        sampleValues={sampleValues}
+        variableNames={variableNames}
+      />
     </div>
   );
 }
