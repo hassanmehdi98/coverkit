@@ -31,46 +31,63 @@ export function LiveDemo() {
   }
 
   return (
-    <div className="w-full">
-      <label className="block font-[family-name:var(--font-landing-sans)] text-sm text-[color:var(--landing-muted)]">
-        Type a title to update the preview
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="mt-2 w-full rounded-md border border-white/15 bg-black/25 px-4 py-3 text-base text-white outline-none ring-[color:var(--landing-accent)] placeholder:text-white/35 focus:ring-2"
-          placeholder="Page title"
-          maxLength={200}
-        />
-      </label>
-
-      <div className="mt-5 overflow-hidden rounded-sm shadow-[0_30px_80px_rgba(0,0,0,0.45)] ring-1 ring-white/10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          key={debounced}
-          src={src}
-          alt="Live Open Graph card preview"
-          width={1200}
-          height={630}
-          className={`h-auto w-full transition-opacity duration-500 ${fade ? "opacity-100" : "opacity-0"}`}
-        />
-      </div>
-
-      <div className="mt-3 flex items-center gap-2">
-        <a
-          href={path}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="min-w-0 flex-1 truncate font-mono text-xs text-[color:var(--landing-muted)] underline decoration-white/25 underline-offset-2 transition hover:text-white hover:decoration-white/50"
-        >
+    <div className="ck-product-frame w-full">
+      <div className="ck-product-chrome">
+        <div className="ck-product-dots" aria-hidden>
+          <span />
+          <span />
+          <span />
+        </div>
+        <div className="min-w-0 flex-1 truncate rounded-[var(--radius-sm)] border border-border bg-surface-sunken px-2.5 py-1 font-mono text-[11px] text-muted">
           {displayUrl}
-        </a>
+        </div>
         <button
           type="button"
           onClick={() => void copyUrl()}
-          className="shrink-0 rounded border border-white/15 px-2 py-1 font-[family-name:var(--font-landing-sans)] text-xs text-[color:var(--landing-muted)] transition hover:border-white/30 hover:text-white"
+          className="ck-btn ck-btn-secondary shrink-0 !px-2 !py-1 !text-[11px]"
         >
           {copied ? "Copied" : "Copy"}
         </button>
+      </div>
+
+      <div className="space-y-4 p-4 md:p-5">
+        <label className="block">
+          <span className="ck-label">title param</span>
+          <div className="mt-1.5 flex items-center gap-2">
+            <span className="hidden font-mono text-xs text-faint sm:inline">
+              ?title=
+            </span>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="ck-input font-mono text-sm"
+              placeholder="Page title"
+              maxLength={200}
+            />
+          </div>
+        </label>
+
+        <div className="overflow-hidden rounded-[var(--radius-md)] border border-border bg-surface-sunken">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={debounced}
+            src={src}
+            alt="Live Open Graph card preview"
+            width={1200}
+            height={630}
+            className={`h-auto w-full transition-opacity duration-300 ${fade ? "opacity-100" : "opacity-0"}`}
+          />
+        </div>
+
+        <pre className="overflow-x-auto rounded-[var(--radius-md)] border border-border-subtle bg-surface-sunken px-3 py-2.5 font-mono text-[11px] leading-relaxed text-muted">
+          <span className="text-faint">{"<"}</span>
+          <span className="text-accent">meta</span>
+          <span className="text-muted"> property=</span>
+          <span className="text-foreground">{`"og:image"`}</span>
+          <span className="text-muted"> content=</span>
+          <span className="text-accent">{`"${displayUrl}"`}</span>
+          <span className="text-faint">{" />"}</span>
+        </pre>
       </div>
     </div>
   );

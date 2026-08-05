@@ -278,7 +278,7 @@ export function Canvas({
   return (
     <div
       ref={viewportRef}
-      className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-zinc-200/80"
+      className="app-grid-subtle relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-surface-sunken"
       onPointerDown={() => onSelect(null)}
     >
       <div
@@ -295,7 +295,7 @@ export function Canvas({
             transformOrigin: "top left",
             ...bg,
           }}
-          className="shadow-lg"
+          className="shadow-[var(--shadow-md)] ring-1 ring-border"
         >
           {template.elements.map((el) => {
             const style = renderElementStyle(el) as CSSProperties;
@@ -356,7 +356,7 @@ export function Canvas({
               <div
                 key={el.id}
                 style={style}
-                className={selected ? "outline outline-2 outline-sky-500" : undefined}
+                className={selected ? "outline outline-2 outline-accent" : undefined}
                 onPointerDown={(e) => startMove(e, el)}
                 onDoubleClick={(e) => {
                   e.stopPropagation();
@@ -367,7 +367,7 @@ export function Canvas({
                 {selected && canEdit && !editing ? (
                   <div
                     onPointerDown={(e) => startResize(e, el)}
-                    className="absolute right-0 bottom-0 h-3.5 w-3.5 translate-x-1/2 translate-y-1/2 cursor-se-resize rounded-sm border-2 border-sky-500 bg-white"
+                    className="absolute right-0 bottom-0 h-3.5 w-3.5 translate-x-1/2 translate-y-1/2 cursor-se-resize rounded-[var(--radius-sm)] border-2 border-accent bg-foreground"
                   />
                 ) : null}
               </div>

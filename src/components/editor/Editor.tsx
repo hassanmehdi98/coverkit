@@ -296,13 +296,13 @@ export function Editor({
 
   if (loadError) {
     return (
-      <div className="p-8 text-sm text-red-600">{loadError}</div>
+      <div className="p-8 text-sm text-danger">{loadError}</div>
     );
   }
 
   if (!template || !meta) {
     return (
-      <div className="p-8 text-sm text-zinc-500">Loading editor...</div>
+      <div className="p-8 text-sm text-muted-foreground">Loading editor...</div>
     );
   }
 
@@ -310,7 +310,7 @@ export function Editor({
     template.elements.find((el) => el.id === selectedId) ?? null;
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] flex-col">
+    <div className="flex h-[calc(100svh-3rem)] flex-col">
       <Toolbar
         name={template.name}
         onNameChange={(name) => patchTemplate({ name })}
@@ -327,13 +327,13 @@ export function Editor({
       />
 
       {error ? (
-        <div className="border-b border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div className="border-b border-danger-border bg-danger-muted px-3 py-2 text-sm text-danger">
           {error}
         </div>
       ) : null}
 
       {!meta.canEdit ? (
-        <div className="border-b border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <div className="border-b border-warning-border bg-warning-muted px-3 py-2 text-sm text-warning">
           Read-only. This template is owned by someone else. Duplicate to edit.
         </div>
       ) : null}

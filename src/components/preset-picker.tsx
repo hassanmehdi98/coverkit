@@ -35,24 +35,33 @@ export function PresetPicker({
 
   return (
     <div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-2 sm:grid-cols-2">
         {PRESET_META.map((p) => (
           <button
             key={p.id}
             type="button"
             disabled={busy != null}
             onClick={() => void create(p.id)}
-            className="rounded-lg border border-zinc-200 bg-white p-4 text-left hover:border-zinc-400 hover:bg-zinc-50 disabled:opacity-50"
+            className="group rounded-[var(--radius-lg)] border border-border bg-surface-elevated p-4 text-left shadow-[var(--shadow-sm)] transition-colors hover:border-border-strong hover:bg-surface-hover disabled:opacity-50"
           >
-            <p className="text-sm font-semibold text-zinc-900">
-              {busy === p.id ? "Creating..." : p.label}
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-semibold tracking-tight text-foreground">
+                {busy === p.id ? "Creating…" : p.label}
+              </p>
+              <span className="font-mono text-[10px] text-faint transition-colors group-hover:text-accent">
+                {p.id}
+              </span>
+            </div>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted">
+              {p.description}
             </p>
-            <p className="mt-1 text-sm text-zinc-500">{p.description}</p>
           </button>
         ))}
       </div>
-      {error ? <p className="mt-2 text-sm text-red-600">{error}</p> : null}
-      <p className="mt-3 text-xs text-zinc-400">{ctaLabel}. No signup required.</p>
+      {error ? <p className="mt-2 text-sm text-danger">{error}</p> : null}
+      <p className="mt-3 font-mono text-[11px] text-muted-foreground">
+        {ctaLabel} · no signup required
+      </p>
     </div>
   );
 }

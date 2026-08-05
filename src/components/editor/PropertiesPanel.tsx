@@ -40,11 +40,9 @@ export function PropertiesPanel({
 
   if (!selected) {
     return (
-      <aside className="w-64 shrink-0 overflow-y-auto border-l border-zinc-200 bg-white p-3">
-        <p className="text-xs font-medium tracking-wide text-zinc-500 uppercase">
-          Background
-        </p>
-        <label className="mt-3 block text-xs text-zinc-500">Type</label>
+      <aside className="w-60 shrink-0 overflow-y-auto border-l border-border bg-surface p-3">
+        <p className="ck-label">Background</p>
+        <label className="mt-3 block text-xs text-muted-foreground">Type</label>
         <select
           disabled={!canEdit}
           value={background.type}
@@ -68,7 +66,7 @@ export function PropertiesPanel({
               });
             }
           }}
-          className="mt-1 w-full rounded border border-zinc-300 px-2 py-1.5 text-sm"
+          className="ck-input mt-1"
         >
           <option value="color">Color</option>
           <option value="gradient">Gradient</option>
@@ -84,7 +82,7 @@ export function PropertiesPanel({
               onChange={(e) =>
                 onChangeBackground({ type: "color", color: e.target.value })
               }
-              className="h-9 w-full"
+              className="h-9 w-full cursor-pointer rounded-[var(--radius-md)] border border-border bg-transparent"
             />
           </Field>
         ) : null}
@@ -106,7 +104,7 @@ export function PropertiesPanel({
                     },
                   })
                 }
-                className="h-9 w-full"
+                className="h-9 w-full cursor-pointer rounded-[var(--radius-md)] border border-border bg-transparent"
               />
             </Field>
             <Field label="To">
@@ -124,7 +122,7 @@ export function PropertiesPanel({
                     },
                   })
                 }
-                className="h-9 w-full"
+                className="h-9 w-full cursor-pointer rounded-[var(--radius-md)] border border-border bg-transparent"
               />
             </Field>
             <Field label={`Angle (${background.gradient?.angle ?? 135}°)`}>
@@ -144,7 +142,7 @@ export function PropertiesPanel({
                     },
                   })
                 }
-                className="w-full"
+                className="w-full accent-[var(--accent)]"
               />
             </Field>
           </>
@@ -160,12 +158,12 @@ export function PropertiesPanel({
                   onChangeBackground({ type: "image", imageUrl: url }),
                 )
               }
-              className="w-full rounded border border-zinc-300 px-2 py-1.5 text-sm hover:bg-zinc-50 disabled:opacity-40"
+              className="ck-btn ck-btn-secondary w-full"
             >
               Upload image
             </button>
             {background.imageUrl ? (
-              <p className="mt-2 truncate text-xs text-zinc-400">
+              <p className="mt-2 truncate font-mono text-xs text-muted-foreground">
                 {background.imageUrl}
               </p>
             ) : null}
@@ -176,9 +174,9 @@ export function PropertiesPanel({
   }
 
   return (
-    <aside className="w-64 shrink-0 overflow-y-auto border-l border-zinc-200 bg-white p-3">
-      <p className="text-xs font-medium tracking-wide text-zinc-500 uppercase">
-        {selected.type} properties
+    <aside className="w-60 shrink-0 overflow-y-auto border-l border-border bg-surface p-3">
+      <p className="ck-label">
+        <span className="font-mono">{selected.type}</span>
       </p>
 
       <Field label="Opacity">
@@ -190,7 +188,7 @@ export function PropertiesPanel({
           disabled={!canEdit}
           value={selected.opacity}
           onChange={(e) => onChangeElement({ opacity: Number(e.target.value) })}
-          className="w-full"
+          className="w-full accent-[var(--accent)]"
         />
       </Field>
 
@@ -202,7 +200,7 @@ export function PropertiesPanel({
               value={selected.content}
               onChange={(e) => onChangeElement({ content: e.target.value })}
               rows={4}
-              className="w-full rounded border border-zinc-300 px-2 py-1.5 text-sm"
+              className="ck-input font-mono"
             />
           </Field>
           <Field label="Font">
@@ -214,7 +212,7 @@ export function PropertiesPanel({
                   fontFamily: e.target.value as typeof selected.fontFamily,
                 })
               }
-              className="w-full rounded border border-zinc-300 px-2 py-1.5 text-sm"
+              className="ck-input"
             >
               {FONT_FAMILIES.map((f) => (
                 <option key={f} value={f}>
@@ -231,7 +229,7 @@ export function PropertiesPanel({
               onChange={(e) =>
                 onChangeElement({ fontSize: Number(e.target.value) || 12 })
               }
-              className="w-full rounded border border-zinc-300 px-2 py-1.5 text-sm"
+              className="ck-input font-mono"
             />
           </Field>
           <Field label="Weight">
@@ -243,7 +241,7 @@ export function PropertiesPanel({
                   fontWeight: Number(e.target.value) as typeof selected.fontWeight,
                 })
               }
-              className="w-full rounded border border-zinc-300 px-2 py-1.5 text-sm"
+              className="ck-input font-mono"
             >
               {[400, 500, 600, 700, 800].map((w) => (
                 <option key={w} value={w}>
@@ -258,7 +256,7 @@ export function PropertiesPanel({
               disabled={!canEdit}
               value={selected.color}
               onChange={(e) => onChangeElement({ color: e.target.value })}
-              className="h-9 w-full"
+              className="h-9 w-full cursor-pointer rounded-[var(--radius-md)] border border-border bg-transparent"
             />
           </Field>
           <Field label="Align">
@@ -270,7 +268,7 @@ export function PropertiesPanel({
                   textAlign: e.target.value as typeof selected.textAlign,
                 })
               }
-              className="w-full rounded border border-zinc-300 px-2 py-1.5 text-sm"
+              className="ck-input"
             >
               <option value="left">Left</option>
               <option value="center">Center</option>
@@ -286,7 +284,7 @@ export function PropertiesPanel({
               onChange={(e) =>
                 onChangeElement({ lineHeight: Number(e.target.value) || 1 })
               }
-              className="w-full rounded border border-zinc-300 px-2 py-1.5 text-sm"
+              className="ck-input font-mono"
             />
           </Field>
         </>
@@ -300,7 +298,7 @@ export function PropertiesPanel({
               disabled={!canEdit}
               value={selected.fill}
               onChange={(e) => onChangeElement({ fill: e.target.value })}
-              className="h-9 w-full"
+              className="h-9 w-full cursor-pointer rounded-[var(--radius-md)] border border-border bg-transparent"
             />
           </Field>
           <Field label="Radius">
@@ -313,7 +311,7 @@ export function PropertiesPanel({
               onChange={(e) =>
                 onChangeElement({ borderRadius: Number(e.target.value) })
               }
-              className="w-full"
+              className="w-full accent-[var(--accent)]"
             />
           </Field>
         </>
@@ -328,7 +326,7 @@ export function PropertiesPanel({
               onClick={() =>
                 void uploadImage((url) => onChangeElement({ src: url }))
               }
-              className="w-full rounded border border-zinc-300 px-2 py-1.5 text-sm hover:bg-zinc-50 disabled:opacity-40"
+              className="ck-btn ck-btn-secondary w-full"
             >
               Replace image
             </button>
@@ -338,7 +336,7 @@ export function PropertiesPanel({
               disabled={!canEdit}
               value={selected.src}
               onChange={(e) => onChangeElement({ src: e.target.value })}
-              className="w-full rounded border border-zinc-300 px-2 py-1.5 text-sm"
+              className="ck-input font-mono"
             />
           </Field>
           <Field label="Radius">
@@ -351,7 +349,7 @@ export function PropertiesPanel({
               onChange={(e) =>
                 onChangeElement({ borderRadius: Number(e.target.value) })
               }
-              className="w-full"
+              className="w-full accent-[var(--accent)]"
             />
           </Field>
           <Field label="Fit">
@@ -363,7 +361,7 @@ export function PropertiesPanel({
                   objectFit: e.target.value as typeof selected.objectFit,
                 })
               }
-              className="w-full rounded border border-zinc-300 px-2 py-1.5 text-sm"
+              className="ck-input"
             >
               <option value="cover">Cover</option>
               <option value="contain">Contain</option>
@@ -384,7 +382,7 @@ function Field({
 }) {
   return (
     <div className="mt-3">
-      <label className="block text-xs text-zinc-500">{label}</label>
+      <label className="block text-xs text-muted-foreground">{label}</label>
       <div className="mt-1">{children}</div>
     </div>
   );

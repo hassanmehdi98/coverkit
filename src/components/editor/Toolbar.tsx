@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 type SaveState = "idle" | "saving" | "saved" | "error";
 
 export function Toolbar({
@@ -28,44 +26,38 @@ export function Toolbar({
   busy: boolean;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-3 border-b border-zinc-200 bg-white px-3 py-2">
-      <Link href="/" className="text-sm font-semibold text-zinc-900">
-        CoverKit
-      </Link>
-
-      <div className="mx-2 h-5 w-px bg-zinc-200" />
-
+    <div className="flex flex-wrap items-center gap-2 border-b border-border bg-surface px-3 py-1.5">
       {canEdit ? (
         <input
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
           onBlur={onNameBlur}
-          className="min-w-[160px] flex-1 border-0 bg-transparent text-sm font-medium text-zinc-900 outline-none sm:max-w-xs"
+          className="min-w-[160px] flex-1 border-0 bg-transparent text-sm font-medium tracking-tight text-foreground outline-none placeholder:text-faint sm:max-w-xs"
           aria-label="Template name"
         />
       ) : (
-        <span className="flex-1 truncate text-sm font-medium text-zinc-900">
+        <span className="flex-1 truncate text-sm font-medium tracking-tight text-foreground">
           {name}
         </span>
       )}
 
-      <span className="text-xs text-zinc-400">
+      <span className="font-mono text-[11px] text-muted-foreground">
         {saveState === "saving"
-          ? "Saving..."
+          ? "saving…"
           : saveState === "saved"
-            ? "Saved"
+            ? "saved"
             : saveState === "error"
-              ? "Save failed"
+              ? "save failed"
               : null}
       </span>
 
-      <div className="ml-auto flex flex-wrap items-center gap-2">
+      <div className="ml-auto flex flex-wrap items-center gap-1.5">
         {!canEdit ? (
           <button
             type="button"
             disabled={busy}
             onClick={onDuplicate}
-            className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+            className="ck-btn ck-btn-primary !py-1.5"
           >
             Duplicate to edit
           </button>
@@ -76,7 +68,7 @@ export function Toolbar({
             type="button"
             disabled={busy}
             onClick={onClaim}
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-800 hover:bg-zinc-50 disabled:opacity-50"
+            className="ck-btn ck-btn-secondary !py-1.5"
           >
             Save to my account
           </button>
@@ -85,7 +77,7 @@ export function Toolbar({
         <button
           type="button"
           onClick={onPreview}
-          className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-800 hover:bg-zinc-50"
+          className="ck-btn ck-btn-secondary !py-1.5"
         >
           Preview PNG
         </button>

@@ -71,105 +71,119 @@ export function Dashboard() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
-            Dashboard
-          </h1>
-          <p className="mt-1 text-sm text-zinc-500">Templates saved to your account</p>
+    <div className="app-grid flex-1">
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="ck-section-label">Workspace</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-foreground">
+              Templates
+            </h1>
+            <p className="mt-1 text-sm text-muted">
+              Saved to your account · click a name to rename
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowPresets((v) => !v)}
+            className="ck-btn ck-btn-accent"
+          >
+            {showPresets ? "Close" : "New template"}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowPresets((v) => !v)}
-          className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800"
-        >
-          New template
-        </button>
-      </div>
 
-      {showPresets ? (
-        <div className="mt-6 rounded-lg border border-zinc-200 p-4">
-          <PresetPicker />
-        </div>
-      ) : null}
+        {showPresets ? (
+          <div className="ck-product-frame mt-6 p-4 md:p-5">
+            <PresetPicker />
+          </div>
+        ) : null}
 
-      {error ? (
-        <p className="mt-4 text-sm text-red-600">{error}</p>
-      ) : null}
+        {error ? (
+          <p className="mt-4 text-sm text-danger">{error}</p>
+        ) : null}
 
-      {loading ? (
-        <p className="mt-10 text-sm text-zinc-500">Loading...</p>
-      ) : templates.length === 0 ? (
-        <p className="mt-10 text-sm text-zinc-500">
-          No templates yet. Create one, or open an edit link and save it to your account.
-        </p>
-      ) : (
-        <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {templates.map((t) => (
-            <li
-              key={t.id}
-              className="overflow-hidden rounded-lg border border-zinc-200 bg-white"
+        {loading ? (
+          <p className="mt-12 font-mono text-sm text-muted-foreground">loading…</p>
+        ) : templates.length === 0 ? (
+          <div className="ck-panel mt-12 rounded-[var(--radius-lg)] px-6 py-14 text-center">
+            <p className="text-sm font-medium text-foreground">No templates yet</p>
+            <p className="mx-auto mt-2 max-w-sm text-sm text-muted">
+              Create one here, or open an edit link and save it to your account.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowPresets(true)}
+              className="ck-btn ck-btn-secondary mt-6"
             >
-              <Link href={`/t/${t.id}/edit`} className="block bg-zinc-100">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/img/${t.id}.png?title=${encodeURIComponent(t.name)}`}
-                  alt=""
-                  width={300}
-                  className="h-auto w-full"
-                />
-              </Link>
-              <div className="space-y-2 p-3">
-                {renamingId === t.id ? (
-                  <input
-                    autoFocus
-                    value={renameValue}
-                    onChange={(e) => setRenameValue(e.target.value)}
-                    onBlur={() => void commitRename(t.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") void commitRename(t.id);
-                      if (e.key === "Escape") setRenamingId(null);
-                    }}
-                    className="w-full rounded border border-zinc-300 px-2 py-1 text-sm"
+              New template
+            </button>
+          </div>
+        ) : (
+          <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {templates.map((t) => (
+              <li key={t.id} className="ck-card group">
+                <Link href={`/t/${t.id}/edit`} className="block bg-surface-sunken">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/img/${t.id}.png?title=${encodeURIComponent(t.name)}`}
+                    alt=""
+                    width={300}
+                    className="h-auto w-full"
                   />
-                ) : (
-                  <button
-                    type="button"
-                    className="block w-full truncate text-left text-sm font-medium text-zinc-900"
-                    onClick={() => {
-                      setRenamingId(t.id);
-                      setRenameValue(t.name);
-                    }}
-                    title="Click to rename"
-                  >
-                    {t.name}
-                  </button>
-                )}
-                <p className="text-xs text-zinc-500">
-                  {new Date(t.createdAt).toLocaleDateString()}
-                </p>
-                <div className="flex gap-2">
-                  <Link
-                    href={`/t/${t.id}/edit`}
-                    className="rounded border border-zinc-300 px-2 py-1 text-xs text-zinc-700 hover:bg-zinc-50"
-                  >
-                    Open
-                  </Link>
-                  <button
-                    type="button"
-                    disabled={busyId === t.id}
-                    onClick={() => void remove(t.id)}
-                    className="rounded border border-red-200 px-2 py-1 text-xs text-red-700 hover:bg-red-50 disabled:opacity-50"
-                  >
-                    Delete
-                  </button>
+                </Link>
+                <div className="space-y-2.5 p-3">
+                  {renamingId === t.id ? (
+                    <input
+                      autoFocus
+                      value={renameValue}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      onBlur={() => void commitRename(t.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") void commitRename(t.id);
+                        if (e.key === "Escape") setRenamingId(null);
+                      }}
+                      className="ck-input"
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      className="block w-full truncate text-left text-sm font-medium tracking-tight text-foreground transition-colors hover:text-accent"
+                      onClick={() => {
+                        setRenamingId(t.id);
+                        setRenameValue(t.name);
+                      }}
+                      title="Click to rename"
+                    >
+                      {t.name}
+                    </button>
+                  )}
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-mono text-[11px] text-muted-foreground">
+                      {new Date(t.createdAt).toLocaleDateString()}
+                    </p>
+                    <div className="flex gap-1.5">
+                      <Link
+                        href={`/t/${t.id}/edit`}
+                        className="ck-btn ck-btn-secondary !px-2 !py-1 !text-[11px]"
+                      >
+                        Open
+                      </Link>
+                      <button
+                        type="button"
+                        disabled={busyId === t.id}
+                        onClick={() => void remove(t.id)}
+                        className="ck-btn ck-btn-danger !px-2 !py-1 !text-[11px]"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

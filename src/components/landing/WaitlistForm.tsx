@@ -33,30 +33,33 @@ export function WaitlistForm({ source = "pricing" }: { source?: string }) {
 
     track("waitlist_signup", { source });
     setStatus("ok");
-    setMessage("Added. We will email you when Pro opens.");
+    setMessage("You’re on the list. We’ll email when Pro opens.");
     setEmail("");
   }
 
   return (
-    <form onSubmit={(e) => void onSubmit(e)} className="mt-4 flex flex-col gap-2 sm:flex-row">
+    <form
+      onSubmit={(e) => void onSubmit(e)}
+      className="mt-8 flex flex-col gap-2 sm:flex-row sm:flex-wrap"
+    >
       <input
         type="email"
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@company.com"
-        className="min-w-0 flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:ring-2 focus:ring-teal-700/40"
+        className="ck-input min-w-0 flex-1 font-mono text-sm"
       />
       <button
         type="submit"
         disabled={status === "loading"}
-        className="rounded-md bg-teal-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-teal-700 disabled:opacity-50"
+        className="ck-btn ck-btn-accent"
       >
-        {status === "loading" ? "Submitting..." : "Join the waitlist"}
+        {status === "loading" ? "Submitting…" : "Join waitlist"}
       </button>
       {message ? (
         <p
-          className={`sm:basis-full text-sm ${status === "error" ? "text-red-600" : "text-teal-800"}`}
+          className={`text-sm sm:basis-full ${status === "error" ? "text-danger" : "text-accent"}`}
         >
           {message}
         </p>

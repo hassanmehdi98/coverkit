@@ -25,7 +25,6 @@ export function UrlBar({
     [appUrl, templateId, sampleValues, variableNames],
   );
 
-  // Query params update at the end of the URL — keep that end in view.
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollLeft = el.scrollWidth;
@@ -41,17 +40,18 @@ export function UrlBar({
   }
 
   return (
-    <div className="shrink-0 border-t border-zinc-200 bg-white px-3 py-2">
+    <div className="shrink-0 border-t border-border bg-surface-elevated px-3 py-2">
       <div className="flex items-center gap-2">
-        <span className="shrink-0 text-xs font-medium tracking-wide text-zinc-500 uppercase">
-          Image URL
-        </span>
-        <div ref={scrollRef} className="min-w-0 flex-1 overflow-x-auto">
+        <span className="ck-label shrink-0">URL</span>
+        <div
+          ref={scrollRef}
+          className="min-w-0 flex-1 overflow-x-auto rounded-[var(--radius-sm)] border border-border bg-surface-sunken px-2 py-1"
+        >
           <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block whitespace-nowrap font-mono text-xs text-blue-700 underline-offset-2 hover:underline"
+            className="block whitespace-nowrap font-mono text-[11px] text-accent transition-colors hover:text-accent-hover"
             title={url}
           >
             {url}
@@ -60,29 +60,29 @@ export function UrlBar({
         <button
           type="button"
           onClick={() => void copy("url", url)}
-          className="shrink-0 rounded bg-zinc-900 px-2.5 py-1 text-xs font-medium text-white hover:bg-zinc-800"
+          className="ck-btn ck-btn-primary !px-2.5 !py-1 !text-[11px]"
         >
           {copied === "url" ? "Copied" : "Copy"}
         </button>
         <button
           type="button"
           onClick={() => setShowMeta((v) => !v)}
-          className="shrink-0 rounded border border-zinc-300 px-2.5 py-1 text-xs text-zinc-700 hover:bg-zinc-50"
+          className="ck-btn ck-btn-secondary !px-2.5 !py-1 !text-[11px]"
           aria-expanded={showMeta}
         >
-          {showMeta ? "Hide meta" : "Meta tag"}
+          {showMeta ? "Hide" : "Meta"}
         </button>
       </div>
 
       {showMeta ? (
         <div className="mt-2 flex gap-2">
-          <code className="min-w-0 flex-1 overflow-x-auto rounded border border-zinc-200 bg-zinc-50 px-2 py-1.5 font-mono text-xs text-zinc-800">
+          <code className="min-w-0 flex-1 overflow-x-auto rounded-[var(--radius-md)] border border-border bg-surface-sunken px-2 py-1.5 font-mono text-[11px] text-muted">
             {meta}
           </code>
           <button
             type="button"
             onClick={() => void copy("meta", meta)}
-            className="shrink-0 self-start rounded border border-zinc-300 px-2.5 py-1 text-xs text-zinc-700 hover:bg-zinc-50"
+            className="ck-btn ck-btn-secondary shrink-0 self-start !px-2.5 !py-1 !text-[11px]"
           >
             {copied === "meta" ? "Copied" : "Copy"}
           </button>
