@@ -45,12 +45,12 @@ export function LandingPage() {
         <div className="relative mx-auto flex min-h-[calc(100svh-3rem)] max-w-6xl flex-col px-5 pb-20 pt-14 md:px-8 md:pt-20">
           <div className="max-w-2xl">
             <p className="ck-section-label">Open Graph image API</p>
-            <h1 className="mt-4 text-[clamp(2.75rem,7vw,4.75rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-foreground">
+            <p className="mt-4 text-[clamp(2.75rem,7vw,4.75rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-foreground">
               CoverKit
-            </h1>
-            <p className="mt-5 max-w-lg text-xl font-medium tracking-[-0.02em] text-foreground/90 md:text-2xl">
-              Every page deserves its own social card
             </p>
+            <h1 className="mt-5 max-w-xl text-xl font-medium tracking-[-0.02em] text-foreground/90 md:text-2xl">
+              One template, every page its own image
+            </h1>
             <p className="mt-3 max-w-md text-[15px] leading-relaxed text-muted">
               Design one template. Serve every page a unique OG image from a URL
               with query params — no rebuilds, no screenshot farm.

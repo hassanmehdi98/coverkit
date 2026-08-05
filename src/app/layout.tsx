@@ -3,6 +3,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { Header } from "@/components/header";
 import { Providers } from "@/components/providers";
+import {
+  APP_URL,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+  TWITTER_HANDLE,
+} from "@/lib/seo";
 
 import "./globals.css";
 
@@ -16,34 +23,35 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const appUrl = process.env.APP_URL ?? "https://coverkit.dev";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(appUrl),
-  title: "CoverKit",
-  description:
-    "Design Open Graph templates and generate cover images from a URL.",
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: SITE_TITLE,
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
   openGraph: {
-    title: "CoverKit",
-    description:
-      "Every page deserves its own social card. Design one template — every page gets a card, automatically.",
-    url: appUrl,
-    siteName: "CoverKit",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: APP_URL,
+    siteName: SITE_NAME,
+    locale: "en_US",
     type: "website",
     images: [
       {
         url: "/img/site.png",
         width: 1200,
         height: 630,
-        alt: "CoverKit — Every page deserves its own social card",
+        alt: SITE_TITLE,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "CoverKit",
-    description:
-      "Every page deserves its own social card. Design one template — every page gets a card, automatically.",
+    site: TWITTER_HANDLE,
+    creator: TWITTER_HANDLE,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: ["/img/site.png"],
   },
 };
