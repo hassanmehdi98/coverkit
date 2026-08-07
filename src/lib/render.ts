@@ -148,7 +148,7 @@ function watermarkNode(): SatoriNode {
         color: "rgba(255,255,255,0.55)",
         letterSpacing: 0.2,
       },
-      children: "made with CoverKit",
+      children: "made with coverkit.dev",
     },
   };
 }
