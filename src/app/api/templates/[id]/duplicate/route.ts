@@ -5,6 +5,10 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { resolveExistingUserId } from "@/lib/session-user";
 import { templateFromDb } from "@/lib/template";
+import {
+  deriveTemplateName,
+  uniqueTemplateName,
+} from "@/lib/template-name";
 
 export const runtime = "nodejs";
 
@@ -25,11 +29,28 @@ export async function POST(_request: Request, context: RouteContext) {
 
   const userId = await resolveExistingUserId(session?.user?.id);
 
+  const elements = Array.isArray(row.elements) ? row.elements : [];
+  const existing = userId
+    ? await prisma.template.findMany({
+        where: { userId },
+        select: { name: true },
+      })
+    : [{ name: row.name }];
+
+  const baseName = deriveTemplateName(
+    elements as Array<{ type: string; content?: string }>,
+    row.name.replace(/\s+\d+$/, "").replace(/\s+\(copy\)$/i, "") || row.name,
+  );
+  const name = uniqueTemplateName(
+    baseName,
+    existing.map((t) => t.name),
+  );
+
   const copy = await prisma.template.create({
     data: {
       id: nanoid(12),
       userId,
-      name: `${row.name} (copy)`,
+      name,
       background: row.background ?? {},
       elements: row.elements ?? [],
     },

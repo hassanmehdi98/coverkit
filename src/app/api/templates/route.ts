@@ -7,6 +7,10 @@ import { prisma } from "@/lib/db";
 import { createTemplateContent, type PresetId } from "@/lib/presets";
 import { resolveExistingUserId } from "@/lib/session-user";
 import { templateFromDb } from "@/lib/template";
+import {
+  deriveTemplateName,
+  uniqueTemplateName,
+} from "@/lib/template-name";
 
 export const runtime = "nodejs";
 
@@ -34,11 +38,24 @@ export async function POST(request: NextRequest) {
 
   const userId = await resolveExistingUserId(session?.user?.id);
 
+  const existing = userId
+    ? await prisma.template.findMany({
+        where: { userId },
+        select: { name: true },
+      })
+    : [];
+
+  const baseName = deriveTemplateName(content.elements, content.name);
+  const name = uniqueTemplateName(
+    baseName,
+    existing.map((t) => t.name),
+  );
+
   const row = await prisma.template.create({
     data: {
       id,
       userId,
-      name: content.name,
+      name,
       background: content.background as object,
       elements: content.elements as object,
     },
